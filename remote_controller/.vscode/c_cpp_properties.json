@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "E:\\Program Files\\Arduino\\tools\\**",
+                "E:\\Program Files\\Arduino\\hardware\\arduino\\avr\\**",
+                "C:\\Users\\bahnh\\Documents\\Arduino\\libraries\\**"
+            ],
+            "forcedInclude": [
+                "E:\\Program Files\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14"
+        }
+    ],
+    "version": 4
+}

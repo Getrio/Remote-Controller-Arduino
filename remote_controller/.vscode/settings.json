@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "*.gcode": "gcode",
+        "ostream": "cpp",
+        "*.tcc": "cpp",
+        "exception": "cpp",
+        "fstream": "cpp",
+        "iosfwd": "cpp",
+        "new": "cpp",
+        "sstream": "cpp",
+        "streambuf": "cpp",
+        "cmath": "cpp",
+        "cstddef": "cpp"
+    }
+}

@@ -6,9 +6,8 @@
 
 #define VERBOSE 1
 
-/* Valori per la conversione da 0/1023 a 0/255,
-   funzionano se i potenziometri sono centrati a
-   530
+/* Conversion values from 0/1023 to 0/255,
+   my potentiometers bounds when are centered to 530
 */
 #define pot_min_right_x 160
 #define pot_max_right_x 915
@@ -19,10 +18,12 @@
 #define pot_min_left_y 195
 #define pot_max_left_y 880
 
-#define button1_pin 2  // bottone basso filo arancio
-#define button2_pin 4  // bottone medio filo verde
-#define button3_pin 3  // bottone alto filo rosso
+// Menù button pin
+#define button1_pin 2  // lower button, orange wire
+#define button2_pin 4  // middle button, green wire
+#define button3_pin 3  // upper button, red wire
 
+// Potentiometers, switch and nRF24L01 pin
 #define pot_right_x_pin 1
 #define pot_right_y_pin 0
 #define pot_left_x_pin 2
@@ -32,10 +33,12 @@
 #define ce_pin 5
 #define csn_pin 6
 
+// LCD pin
 #define lcd_row 2
 #define lcd_col 16
 #define lcd_backlight_timeout 5000
 
+// Number of different node for nrf24l01
 #define node_name_number 3
 #define node_name_length 5
 
@@ -61,17 +64,16 @@ bool rec_online = true;
 byte main_menu = 0;
 bool show_menu = false;
 
-// Variabili per NRF24L01
+// VAriables for NRF24L01
 RF24 radio(ce_pin, csn_pin);  // nRF24L01 (CE, CSN)
-// const byte address[6] = "00001"; // Address;
 const byte nodeAddresses[node_name_number][node_name_length] = {"node1", "node2", "node3"};
 int selected_node = 1;
 
-// Definizione variabile per LCD
+// Variables for LCD
 // set the LCD address to 0x27 for a 16 chars and 2 line display
 LiquidCrystal_I2C lcd(0x27, lcd_col, lcd_row);
 
-// Pacchetto dati da inviare trami nrf24
+// Data package for comunication through nrf24l01
 struct Data_Package {
     byte pot_right_x;
     byte pot_right_y;
@@ -139,22 +141,23 @@ void setup() {
     Serial.begin(9600);
 #endif
 
-    // Configurazione input pin bottoni
+    // Menù input pin button configuration
     pinMode(button1_pin, INPUT_PULLUP);
     pinMode(button2_pin, INPUT_PULLUP);
     pinMode(button3_pin, INPUT_PULLUP);
 
-    // Configurazioni interrutori
+    // Switch configuration
     pinMode(switch_left_pin, INPUT_PULLUP);
     pinMode(switch_right_pin, INPUT_PULLUP);
 
-    // Configurazione interrupt bottoni
-    attachInterrupt(digitalPinToInterrupt(button3_pin), button12_callback, FALLING);
-    attachInterrupt(digitalPinToInterrupt(button1_pin), button3_callback, FALLING);
+    // Configuration interrupt menù button (button 3 and 2 are connected to the same gpio, 
+    // but the second is also connected to another gpio with diode)
+    attachInterrupt(digitalPinToInterrupt(button3_pin), button32_callback, FALLING);
+    attachInterrupt(digitalPinToInterrupt(button1_pin), button1_callback, FALLING);
 
     subMenu1Items[selected_node] += " (sel)";
 
-    // Configurazione Radio
+    // Radio configuration
     radio.begin();
     // radio.openWritingPipe(address);
     radio.setAutoAck(true);
@@ -164,7 +167,7 @@ void setup() {
     radio.setDataRate(RF24_250KBPS);
     radio.setPALevel(RF24_PA_LOW);
 
-    // Configurazione lcd
+    // LCD configuration
     lcd.init();
     lcd.backlight();
     // Creates the byte for the 3 custom characters
@@ -186,7 +189,8 @@ void loop() {
     pot_left_y_state = analogRead(pot_left_y_pin);
     switch_left_state = digitalRead(switch_left_pin);
     switch_right_state = digitalRead(switch_right_pin);
-
+    
+    // Debugging stuff
     //  lcd_line0 = String(switch_left_state, DEC) + ", "
     //              + String(switch_right_state, DEC) + ", "
     //              + String(buttonState1, DEC) + ", "
@@ -504,7 +508,7 @@ void menuDown(int& menuPage, int& cursorPosition, int maxMenuPages, int menuItem
     Serial.println(cursorPosition);
 }
 
-void button12_callback() {
+void button32_callback() {
     if (millis() - last_call_int > 300) {
         int tmp2 = digitalRead(button2_pin);
         if (tmp2 == LOW) {
@@ -517,7 +521,7 @@ void button12_callback() {
     last_call_int = millis();
 }
 
-void button3_callback() {
+void button1_callback() {
     if (millis() - last_call_int3 > 300) {
         buttonState3 = !buttonState3;
         last_lcd_backlight = millis();
